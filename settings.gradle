@@ -1,1 +1,4 @@
-rootProject.name = 'transaction-service'
+rootProject.name = 'finance-tracker-services'
+
+include 'report-service'
+include 'transaction-service'
