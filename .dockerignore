@@ -1,0 +1,8 @@
+.aiox-core
+node_modules
+.git
+.idea
+.gradle
+build
+*/build
+*/.gradle
