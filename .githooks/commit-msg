@@ -1,0 +1,21 @@
+#!/bin/bash
+
+COMMIT_MSG_FILE=$1
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+CONVENTIONAL_REGEX="^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9_-]+\))?: [a-z0-9].+"
+
+if ! echo "$COMMIT_MSG" | grep -Eqa "$CONVENTIONAL_REGEX"; then
+    echo ""
+    echo "[ERRO] O commit foi rejeitado! X"
+    echo "Sua mensagem: \"$COMMIT_MSG\""
+    echo ""
+    echo "Por favor, siga o padrao Conventional Commits:"
+    echo "  feat(auth): adiciona fluxo de login com JWT"
+    echo "  fix(db): corrige vazamento de conexao no pool"
+    echo ""
+    echo "Tipos aceitos: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert"
+    echo "A descricao deve comecar com letra minuscula."
+    echo ""
+    exit 1
+fi
