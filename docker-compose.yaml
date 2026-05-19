@@ -5,21 +5,20 @@ services:
     container_name: postgres
     environment:
       POSTGRES_USER: root
-      POSTGRES_DB: finance_db
+      POSTGRES_DB: postgres
       POSTGRES_PASSWORD: root
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U root -d finance_db"]
+      test: ["CMD-SHELL", "pg_isready -U root -d postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
     restart: unless-stopped
     networks:
-      - infra_network
       - finance_network
 
   rabbitmq:
@@ -36,12 +35,36 @@ services:
       timeout: 5s
       retries: 5
 
+  transaction-service:
+    build: ./transaction-service
+    container_name: transaction-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    networks:
+      - finance_network
+
+  report-service:
+    build: ./report-service
+    container_name: report-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - "8180:8180"
+    networks:
+      - finance_network
+
 volumes:
   postgres_data:
     name: postgres_data
 
 networks:
-  infra_network:
-    name: infra_network
   finance_network:
     driver: bridge

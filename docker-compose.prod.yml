@@ -1,0 +1,18 @@
+services:
+  report-service:
+    image: ghcr.io/vitorhugo-java/report-service:latest
+    ports: !reset [ ]
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 512M
+
+  transaction-service:
+    image: ghcr.io/vitorhugo-java/transaction-service:latest
+    ports: !reset [ ]
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 512M
