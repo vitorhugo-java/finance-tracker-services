@@ -70,6 +70,23 @@ services:
     networks:
       - finance_network
 
+  gateway-service:
+    build:
+      context: .
+      dockerfile: ./gateway-service/Dockerfile
+    container_name: gateway-service
+    labels:
+      - "org.springframework.boot.docker.compose.skip.readiness-check=true"
+    depends_on:
+      transaction-service:
+        condition: service_healthy
+      report-service:
+        condition: service_healthy
+    ports:
+      - "8280:8280"
+    networks:
+      - finance_network
+
 volumes:
   postgres_data:
     name: postgres_data

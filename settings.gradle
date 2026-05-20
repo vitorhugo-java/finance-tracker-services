@@ -1,4 +1,5 @@
 rootProject.name = 'finance-tracker-services'
 
+include 'gateway-service'
 include 'report-service'
 include 'transaction-service'

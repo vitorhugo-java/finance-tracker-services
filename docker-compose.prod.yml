@@ -16,3 +16,12 @@ services:
         limits:
           cpus: '0.3'
           memory: 512M
+
+  gateway-service:
+    image: ghcr.io/vitorhugo-java/gateway-service:latest
+    ports: !reset [ ]
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M

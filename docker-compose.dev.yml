@@ -7,6 +7,10 @@ services:
     build: off
     ports: !reset []
 
+  gateway-service:
+    build: off
+    ports: !reset []
+
   postgres:
     profiles:
       - dev
