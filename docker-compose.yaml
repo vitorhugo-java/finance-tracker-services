@@ -37,7 +37,9 @@ services:
       retries: 5
 
   transaction-service:
-    build: ./transaction-service
+    build:
+      context: .
+      dockerfile: ./transaction-service/Dockerfile
     container_name: transaction-service
     depends_on:
       postgres:
@@ -50,7 +52,9 @@ services:
       - finance_network
 
   report-service:
-    build: ./report-service
+    build:
+      context: .
+      dockerfile: ./report-service/Dockerfile
     container_name: report-service
     depends_on:
       postgres:

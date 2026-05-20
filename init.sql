@@ -1,2 +1,2 @@
-CREATE DATABASE IF NOT EXISTS report_service_db;
-CREATE DATABASE IF NOT EXISTS transaction_service_db;
+CREATE DATABASE report_service_db;
+CREATE DATABASE transaction_service_db;
