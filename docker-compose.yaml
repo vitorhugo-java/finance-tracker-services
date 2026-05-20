@@ -41,6 +41,8 @@ services:
       context: .
       dockerfile: ./transaction-service/Dockerfile
     container_name: transaction-service
+    labels:
+      - "org.springframework.boot.docker.compose.skip.readiness-check=true"
     depends_on:
       postgres:
         condition: service_healthy
@@ -56,6 +58,8 @@ services:
       context: .
       dockerfile: ./report-service/Dockerfile
     container_name: report-service
+    labels:
+      - "org.springframework.boot.docker.compose.skip.readiness-check=true"
     depends_on:
       postgres:
         condition: service_healthy

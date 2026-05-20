@@ -1,0 +1,16 @@
+services:
+  transaction-service:
+    build: off
+    ports: !reset []
+
+  report-service:
+    build: off
+    ports: !reset []
+
+  postgres:
+    profiles:
+      - dev
+
+  finance-mq:
+    profiles:
+      - dev
