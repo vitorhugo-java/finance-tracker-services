@@ -12,7 +12,8 @@ services:
     ports: !reset []
 
   keycloak:
-    ports: !reset [ ]
+    ports:
+      - "8180:8080"
 
   postgres:
     profiles:

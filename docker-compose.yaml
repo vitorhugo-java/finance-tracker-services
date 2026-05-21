@@ -45,39 +45,9 @@ services:
       KC_HEALTH_ENABLED: "true"
     command: start-dev --import-realm
     ports:
-      - "8080:8080"
+      - "8180:8080"
     volumes:
-      - ./keycloak/import/finance-tracker-realm.json:/opt/keycloak/data/import/finance-tracker-realm.json:ro
-    networks:
-      - finance_network
-
-  transaction-service:
-    build:
-      context: .
-      dockerfile: ./transaction-service/Dockerfile
-    container_name: transaction-service
-    depends_on:
-      postgres:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-    ports:
-      - "8082:8080"
-    networks:
-      - finance_network
-
-  report-service:
-    build:
-      context: .
-      dockerfile: ./report-service/Dockerfile
-    container_name: report-service
-    depends_on:
-      postgres:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-    ports:
-      - "8180:8180"
+      - ./keycloak/import/finance-tracker-realm-realm.json:/opt/keycloak/data/import/finance-tracker-realm-realm.json
     networks:
       - finance_network
 
@@ -99,7 +69,37 @@ services:
       report-service:
         condition: service_healthy
     ports:
+      - "8080:8080"
+    networks:
+      - finance_network
+
+  transaction-service:
+    build:
+      context: .
+      dockerfile: ./transaction-service/Dockerfile
+    container_name: transaction-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    ports:
       - "8280:8280"
+    networks:
+      - finance_network
+
+  report-service:
+    build:
+      context: .
+      dockerfile: ./report-service/Dockerfile
+    container_name: report-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - "8380:8380"
     networks:
       - finance_network
 

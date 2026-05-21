@@ -32,5 +32,5 @@ ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError"
 
 COPY --from=build /app/gateway-service/build/libs/*.jar app.jar
 
-EXPOSE 8280
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

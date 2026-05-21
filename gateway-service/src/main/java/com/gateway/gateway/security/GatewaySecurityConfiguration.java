@@ -30,7 +30,8 @@ public class GatewaySecurityConfiguration {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/api/transactions/v3/api-docs",
-                                "/api/reports/v3/api-docs")
+                                "/api/reports/v3/api-docs",
+                                "/auth/**")
                         .permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))

@@ -25,7 +25,8 @@ spring:
   docker:
     compose:
       profiles:
-        active: ${DOCKER_PROFILE:prod}
+        active: ${DOCKER_PROFILE:dev}
+      enabled: ${DOCKER_ENABLED:false}
 
 application:
   security:
@@ -35,11 +36,11 @@ application:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:4200,http://localhost:5173}
 
 server:
-  port: 8081
+  port: 8280
 
 management:
   server:
-    port: 8081
+    port: 8281
   endpoints:
     web:
       exposure:

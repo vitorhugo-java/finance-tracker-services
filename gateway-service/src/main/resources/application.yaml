@@ -15,6 +15,8 @@ spring:
       - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
       - org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
   security:
+    keycloak:
+      realm: finance-tracker-realm
     oauth2:
       resourceserver:
         jwt:
@@ -44,18 +46,27 @@ spring:
     gateway:
       mvc:
         routes:
+          - id: keycloak_route
+            uri: http://keycloak:8180
+            predicates:
+              - Path=/auth/**
+            filters:
+              - StripPrefix=1
+
           - id: transactions-route
-            uri: http://transaction-service:8080
+            uri: http://transaction-service:8280
             predicates:
               - Path=/api/transactions/**
-            filters:
-              - StripPrefix=2
+
           - id: reports-route
-            uri: http://report-service:8180
+            uri: http://report-service:8380
             predicates:
               - Path=/api/reports/**
-            filters:
-              - StripPrefix=2
+  docker:
+    compose:
+      profiles:
+        active: ${DOCKER_PROFILE:dev}
+      enabled: ${DOCKER_ENABLED:false}
 
 springdoc:
   api-docs:
@@ -63,6 +74,10 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     disable-swagger-default-url: true
+    init-oauth:
+      clientId: gateway-swagger
+      usePkceWithAuthorizationCodeGrant: true
+    oauth2-redirect-url: http://localhost:8080/swagger-ui/oauth2-redirect.html
     urls:
       - name: gateway-service
         url: /v3/api-docs
@@ -84,16 +99,16 @@ application:
   security:
     keycloak:
       realm: ${KEYCLOAK_REALM:finance-tracker-realm}
-      public-base-url: ${KEYCLOAK_PUBLIC_URL:http://localhost:8080}
+      public-base-url: ${KEYCLOAK_PUBLIC_URL:http://localhost:8180}
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:4200,http://localhost:5173}
 
 server:
-  port: 8280
+  port: 8080
 
 management:
   server:
-    port: 8281
+    port: 8081
   endpoints:
     web:
       exposure:
