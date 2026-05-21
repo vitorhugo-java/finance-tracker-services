@@ -11,6 +11,9 @@ services:
     build: off
     ports: !reset []
 
+  keycloak:
+    ports: !reset [ ]
+
   postgres:
     profiles:
       - dev

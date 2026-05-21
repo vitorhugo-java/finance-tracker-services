@@ -36,20 +36,33 @@ services:
       timeout: 5s
       retries: 5
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin123
+      KC_HEALTH_ENABLED: "true"
+    command: start-dev --import-realm
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./keycloak/import/finance-tracker-realm.json:/opt/keycloak/data/import/finance-tracker-realm.json:ro
+    networks:
+      - finance_network
+
   transaction-service:
     build:
       context: .
       dockerfile: ./transaction-service/Dockerfile
     container_name: transaction-service
-    labels:
-      - "org.springframework.boot.docker.compose.skip.readiness-check=true"
     depends_on:
       postgres:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
     ports:
-      - "8080:8080"
+      - "8082:8080"
     networks:
       - finance_network
 
@@ -58,8 +71,6 @@ services:
       context: .
       dockerfile: ./report-service/Dockerfile
     container_name: report-service
-    labels:
-      - "org.springframework.boot.docker.compose.skip.readiness-check=true"
     depends_on:
       postgres:
         condition: service_healthy
@@ -75,9 +86,14 @@ services:
       context: .
       dockerfile: ./gateway-service/Dockerfile
     container_name: gateway-service
-    labels:
-      - "org.springframework.boot.docker.compose.skip.readiness-check=true"
+    environment:
+      KEYCLOAK_REALM: finance-tracker-realm
+      KEYCLOAK_PUBLIC_URL: http://localhost:8080
+      KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/finance-tracker-realm
+      KEYCLOAK_SWAGGER_CLIENT_ID: gateway-swagger
     depends_on:
+      keycloak:
+        condition: service_started
       transaction-service:
         condition: service_healthy
       report-service:

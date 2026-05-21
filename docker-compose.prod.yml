@@ -25,3 +25,11 @@ services:
         limits:
           cpus: '0.5'
           memory: 512M
+
+  keycloak:
+    ports: !reset [ ]
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M

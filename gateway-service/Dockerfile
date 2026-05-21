@@ -1,7 +1,7 @@
 # ============================================================
 # JVM build
 # ============================================================
-FROM eclipse-temurin:25-jdk-jammy AS build
+FROM eclipse-temurin:25-jdk-alpine AS build
 WORKDIR /app
 
 COPY gradlew .
@@ -27,6 +27,8 @@ RUN ./gradlew :gateway-service:bootJar -x test --no-daemon
 # ============================================================
 FROM eclipse-temurin:25-jre-alpine
 WORKDIR /app
+
+ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError"
 
 COPY --from=build /app/gateway-service/build/libs/*.jar app.jar
 

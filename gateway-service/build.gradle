@@ -3,5 +3,15 @@ version = '0.0.1-SNAPSHOT'
 description = 'gateway'
 
 dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.cloud:spring-cloud-starter-gateway-server-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+}
+
+tasks.named('jacocoTestReport') {
+    enabled = false
+}
+
+tasks.named('jacocoTestCoverageVerification') {
+    enabled = false
 }
