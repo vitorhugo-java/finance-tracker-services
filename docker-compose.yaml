@@ -31,13 +31,13 @@ services:
     networks:
       - finance_network
     healthcheck:
-      test: rabbitmq-diagnostics -q check_running
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_running"]
       interval: 10s
       timeout: 5s
       retries: 5
 
   keycloak:
-    image: quay.io/keycloak/keycloak:latest
+    image: quay.io/keycloak/keycloak:26.2
     container_name: keycloak
     environment:
       KEYCLOAK_ADMIN: admin
@@ -50,6 +50,12 @@ services:
       - ./keycloak/import/finance-tracker-realm-realm.json:/opt/keycloak/data/import/finance-tracker-realm-realm.json
     networks:
       - finance_network
+    healthcheck:
+      test: [ "CMD-SHELL","wget --spider -q http://localhost:9000/health/ready || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 15
+      start_period: 60s
 
   gateway-service:
     build:
@@ -58,12 +64,12 @@ services:
     container_name: gateway-service
     environment:
       KEYCLOAK_REALM: finance-tracker-realm
-      KEYCLOAK_PUBLIC_URL: http://localhost:8080
+      KEYCLOAK_PUBLIC_URL: http://keycloak:8080
       KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/finance-tracker-realm
       KEYCLOAK_SWAGGER_CLIENT_ID: gateway-swagger
     depends_on:
       keycloak:
-        condition: service_started
+        condition: service_healthy
       transaction-service:
         condition: service_healthy
       report-service:
@@ -87,6 +93,11 @@ services:
       - "8280:8280"
     networks:
       - finance_network
+    healthcheck:
+      test: [ "CMD-SHELL","wget --spider -q http://localhost:8280/actuator/health || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
 
   report-service:
     build:
@@ -102,6 +113,11 @@ services:
       - "8380:8380"
     networks:
       - finance_network
+    healthcheck:
+      test: [ "CMD","curl","-f","http://localhost:8380/actuator/health" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
 
 volumes:
   postgres_data:

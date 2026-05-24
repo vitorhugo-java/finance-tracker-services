@@ -8,6 +8,23 @@
   "resetPasswordAllowed": true,
   "editUsernameAllowed": false,
   "bruteForceProtected": true,
+  "users": [
+    {
+      "username": "admin",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Finance",
+      "lastName": "Admin",
+      "email": "admin@finance-tracker.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin123",
+          "temporary": false
+        }
+      ]
+    }
+  ],
   "clients": [
     {
       "clientId": "gateway-swagger",

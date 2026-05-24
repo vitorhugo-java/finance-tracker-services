@@ -1,24 +1,19 @@
 services:
-  transaction-service:
-    build: off
-    ports: !reset []
-
-  report-service:
-    build: off
-    ports: !reset []
-
-  gateway-service:
-    build: off
-    ports: !reset []
-
-  keycloak:
-    ports:
-      - "8180:8080"
 
   postgres:
-    profiles:
-      - dev
+    profiles: [dev]
 
-  finance-mq:
-    profiles:
-      - dev
+  rabbitmq:
+    profiles: [dev]
+
+  keycloak:
+    profiles: [dev]
+
+  transaction-service:
+    profiles: ["container"]
+
+  report-service:
+    profiles: ["container"]
+
+  gateway-service:
+    profiles: ["container"]

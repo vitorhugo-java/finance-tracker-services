@@ -26,7 +26,7 @@ spring:
     compose:
       profiles:
         active: ${DOCKER_PROFILE:dev}
-      enabled: ${DOCKER_ENABLED:false}
+      enabled: ${DOCKER_ENABLED:true}
 
 application:
   security:
