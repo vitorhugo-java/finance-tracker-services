@@ -1,4 +1,4 @@
-package com.transaction.transactionservice.entry;
+package com.transaction.transactionservice.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
