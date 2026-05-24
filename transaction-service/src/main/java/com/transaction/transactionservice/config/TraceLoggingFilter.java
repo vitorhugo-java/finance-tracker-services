@@ -20,8 +20,7 @@ public class TraceLoggingFilter extends OncePerRequestFilter {
     private static final String USER_HEADER = "X-User-Id";
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String traceId = firstPresent(request.getHeader(TRACE_HEADER), UUID.randomUUID().toString());
         MDC.put(TRACE_ID, traceId);
         MDC.put(USER_ID, request.getHeader(USER_HEADER));
