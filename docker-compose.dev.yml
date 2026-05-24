@@ -6,6 +6,9 @@ services:
   rabbitmq:
     profiles: [dev]
 
+  redis:
+    profiles: [dev]
+
   keycloak:
     profiles: [dev]
 
