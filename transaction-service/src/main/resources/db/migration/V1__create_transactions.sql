@@ -6,7 +6,7 @@ CREATE TABLE transactions (
     type VARCHAR(20) NOT NULL CHECK (type IN ('INCOME', 'EXPENSE')),
     category VARCHAR(80) NOT NULL,
     status VARCHAR(20) NOT NULL CHECK (status IN ('PENDING', 'COMPLETED', 'FAILED')),
-    transaction_date DATE NOT NULL,
+    transaction_date TIMESTAMPTZ,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL
 );
