@@ -1,4 +1,7 @@
 spring:
+  logging:
+    level:
+      org.springframework.security: TRACE
   application:
     name: gateway-service
   config:
@@ -53,10 +56,19 @@ spring:
             filters:
               - StripPrefix=1
 
+          - id: transactions-docs-route
+            uri: http://transaction-service:8280
+            predicates:
+              - Path=/api/transactions/v3/api-docs
+            filters:
+              - SetPath=/v3/api-docs
+
           - id: transactions-route
             uri: http://transaction-service:8280
             predicates:
               - Path=/api/transactions/**
+            filters:
+              - StripPrefix=2
 
           - id: reports-route
             uri: http://report-service:8380

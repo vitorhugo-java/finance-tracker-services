@@ -1,4 +1,7 @@
 spring:
+  logging:
+    level:
+      org.springframework.security: TRACE
   application:
     name: transaction-service
   threads:

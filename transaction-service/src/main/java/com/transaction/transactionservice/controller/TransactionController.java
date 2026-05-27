@@ -30,7 +30,16 @@ public class TransactionController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a transaction", description = "Creates a financial transaction for the authenticated user")
     @ApiResponse(responseCode = "201", description = "Transaction created successfully")
-    @ApiResponse(responseCode = "400", description = "Validation error")
+    @ApiResponse(
+            responseCode = "400",
+            description = "Validation error",
+            useReturnTypeSchema = true
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "Resource not found",
+            useReturnTypeSchema = true
+    )
     public TransactionResponse create(
             @Parameter(description = "User id injected by gateway", hidden = true)
             @RequestHeader("X-User-Id")

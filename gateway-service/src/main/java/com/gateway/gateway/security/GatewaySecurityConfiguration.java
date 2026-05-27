@@ -13,29 +13,24 @@ import org.springframework.security.web.SecurityFilterChain;
 public class GatewaySecurityConfiguration {
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain security(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .logout(AbstractHttpConfigurer::disable)
-                .rememberMe(AbstractHttpConfigurer::disable)
-                .requestCache(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(authorize -> authorize
+                .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/actuator/health",
-                                "/actuator/health/**",
-                                "/swagger-ui.html",
                                 "/swagger-ui/**",
+                                "/swagger-ui.html",
                                 "/v3/api-docs/**",
-                                "/api/transactions/v3/api-docs",
-                                "/api/reports/v3/api-docs",
-                                "/auth/**")
-                        .permitAll()
-                        .anyRequest().authenticated())
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
-                .addFilterAfter(new UserIdHeaderEnrichmentFilter(), BearerTokenAuthenticationFilter.class)
+
+                                "/api/transactions/**",
+                                "/api/reports/**",
+
+                                "/auth/**",
+                                "/actuator/**"
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                )
+                .oauth2ResourceServer(oauth -> oauth.jwt(Customizer.withDefaults()))
                 .build();
     }
 }
