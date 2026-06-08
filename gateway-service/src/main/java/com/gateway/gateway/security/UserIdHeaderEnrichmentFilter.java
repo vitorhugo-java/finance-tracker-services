@@ -23,6 +23,12 @@ final class UserIdHeaderEnrichmentFilter extends OncePerRequestFilter {
     static final String USER_ID_HEADER = "X-User-Id";
 
     @Override
+    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return path.startsWith("/v3/api-docs") || path.matches("/api/[^/]+/v3/api-docs");
+    }
+
+    @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

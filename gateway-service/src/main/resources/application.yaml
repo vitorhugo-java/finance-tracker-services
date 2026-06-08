@@ -1,7 +1,4 @@
 spring:
-  logging:
-    level:
-      org.springframework.security: TRACE
   application:
     name: gateway-service
   config:
@@ -47,33 +44,34 @@ spring:
       enabled: true
   cloud:
     gateway:
-      mvc:
-        routes:
-          - id: keycloak_route
-            uri: http://keycloak:8180
-            predicates:
-              - Path=/auth/**
-            filters:
-              - StripPrefix=1
+      server:
+        webmvc:
+          routes:
+            - id: keycloak_route
+              uri: ${KEYCLOAK_SERVICE_URI:http://localhost:8180}
+              predicates:
+                - Path=/auth/**
+              filters:
+                - StripPrefix=1
 
-          - id: transactions-docs-route
-            uri: http://transaction-service:8280
-            predicates:
-              - Path=/api/transactions/v3/api-docs
-            filters:
-              - SetPath=/v3/api-docs
+            - id: transactions-docs-route
+              uri: ${TRANSACTION_SERVICE_URI:http://localhost:8280}
+              predicates:
+                - Path=/api/transactions/v3/api-docs
+              filters:
+                - SetPath=/v3/api-docs
 
-          - id: transactions-route
-            uri: http://transaction-service:8280
-            predicates:
-              - Path=/api/transactions/**
-            filters:
-              - StripPrefix=2
+            - id: transactions-route
+              uri: ${TRANSACTION_SERVICE_URI:http://localhost:8280}
+              predicates:
+                - Path=/api/transactions/**
+              filters:
+                - StripPrefix=2
 
-          - id: reports-route
-            uri: http://report-service:8380
-            predicates:
-              - Path=/api/reports/**
+            - id: reports-route
+              uri: ${REPORT_SERVICE_URI:http://localhost:8380}
+              predicates:
+                - Path=/api/reports/**
   docker:
     compose:
       profiles:
@@ -94,9 +92,9 @@ springdoc:
       - name: gateway-service
         url: /v3/api-docs
       - name: transaction-service
-        url: /api/transactions/v3/api-docs
+        url: http://localhost:8080/api/transactions/v3/api-docs
       - name: report-service
-        url: /api/reports/v3/api-docs
+        url: http://localhost:8080/api/reports/v3/api-docs
     oauth:
       client-id: ${KEYCLOAK_SWAGGER_CLIENT_ID:gateway-swagger}
       app-name: Finance Tracker Gateway
@@ -124,4 +122,4 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info, metrics
+        include: health, info, metrics, env
