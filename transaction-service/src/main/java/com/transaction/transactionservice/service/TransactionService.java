@@ -8,9 +8,12 @@ import com.transaction.transactionservice.mapper.TransactionMapper;
 import com.transaction.transactionservice.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
+
+import static com.transaction.transactionservice.config.RedisConfiguration.IDEMPOTENCY_PREFIX;
 
 @Service
 @RequiredArgsConstructor
@@ -20,12 +23,24 @@ public class TransactionService {
     private final TransactionRepository repository;
     private final TransactionMapper mapper;
     private final TransactionEventPublisher publisher;
+    private final RedisTemplate<String, TransactionResponse> redisTemplate;
 
-    public TransactionResponse create(UUID userId, CreateTransactionRequest request) {
+    public TransactionResponse create(UUID userId, String impotencyKey, CreateTransactionRequest request) {
+        String redisKey = IDEMPOTENCY_PREFIX + impotencyKey;
+        TransactionResponse cached = redisTemplate.opsForValue().get(redisKey);
+        if (cached != null) {
+            return cached;
+        }
+
         Transaction transaction = mapper.toEntity(request);
         transaction.setUserId(userId);
         Transaction saved = repository.save(transaction);
+
         publisher.publishCreated(saved);
+
+        TransactionResponse response = mapper.toResponse(saved);
+        redisTemplate.opsForValue().set(redisKey, response);
+
         return mapper.toResponse(saved);
     }
 }

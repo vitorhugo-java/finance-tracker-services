@@ -8,8 +8,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.time.Duration;
+
 @Configuration
 public class RedisConfiguration {
+
+    public static final Duration IDEMPOTENCY_TTL = Duration.ofHours(24);
+    public static final String IDEMPOTENCY_PREFIX = "idempotency:transaction:";
 
     @Bean
     RedisTemplate<String, TransactionResponse> transactionResponseRedisTemplate(RedisConnectionFactory connectionFactory) {

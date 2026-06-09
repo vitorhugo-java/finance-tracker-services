@@ -45,11 +45,15 @@ public class TransactionController {
             @RequestHeader("X-User-Id")
             UUID userId,
 
+            @RequestHeader
+            @Parameter(description = "Idempotency key for ensuring idempotent requests", example = "123e4567-e89b-12d3-a456-426614174000")
+            String idempotencyKey,
+
             @Valid
             @RequestBody
             CreateTransactionRequest request
     ) {
 
-        return transactionService.create(userId, request);
+        return transactionService.create(userId, idempotencyKey, request);
     }
 }

@@ -4,6 +4,7 @@ import com.transaction.transactionservice.dto.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -87,5 +88,18 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.internalServerError().body(response);
+    }
+
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public ResponseEntity<ErrorResponse> handleMissingHeader(MissingRequestHeaderException ex) {
+        ErrorResponse response = new ErrorResponse(
+                OffsetDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Missing Header",
+                "Required header is missing: " + ex.getHeaderName(),
+                List.of()
+        );
+
+        return ResponseEntity.badRequest().body(response);
     }
 }
