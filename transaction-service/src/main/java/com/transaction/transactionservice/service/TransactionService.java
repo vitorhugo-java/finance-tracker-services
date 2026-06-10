@@ -1,6 +1,7 @@
 package com.transaction.transactionservice.service;
 
 import com.transaction.transactionservice.dto.request.CreateTransactionRequest;
+import com.transaction.transactionservice.dto.response.TransactionPageResponse;
 import com.transaction.transactionservice.dto.response.TransactionResponse;
 import com.transaction.transactionservice.entity.Transaction;
 import com.transaction.transactionservice.event.TransactionEventPublisher;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 import static com.transaction.transactionservice.config.RedisConfiguration.IDEMPOTENCY_PREFIX;
@@ -42,5 +44,9 @@ public class TransactionService {
         redisTemplate.opsForValue().set(redisKey, response);
 
         return mapper.toResponse(saved);
+    }
+
+    public TransactionPageResponse getAllByUserId(UUID userId) {
+        return null;
     }
 }

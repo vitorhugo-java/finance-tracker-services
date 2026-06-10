@@ -1,6 +1,7 @@
 package com.transaction.transactionservice.controller;
 
 import com.transaction.transactionservice.dto.request.CreateTransactionRequest;
+import com.transaction.transactionservice.dto.response.TransactionPageResponse;
 import com.transaction.transactionservice.dto.response.TransactionResponse;
 import com.transaction.transactionservice.service.TransactionService;
 
@@ -14,8 +15,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -55,5 +58,21 @@ public class TransactionController {
     ) {
 
         return transactionService.create(userId, idempotencyKey, request);
+    }
+
+    @GetMapping
+    @Operation(summary = "Get all transactions", description = "Retrieves a list of all transactions for the authenticated user")
+    @ApiResponse(responseCode = "200", description = "Transactions retrieved successfully")
+    @ApiResponse(
+            responseCode = "404",
+            description = "Resource not found",
+            useReturnTypeSchema = true
+    )
+    public ResponseEntity<TransactionPageResponse> transactions (
+            @Parameter(description = "User id injected by gateway", hidden = true)
+            @RequestHeader("X-User-Id")
+            UUID userId
+    ) {
+        return ResponseEntity.ok(transactionService.getAllByUserId(userId));
     }
 }

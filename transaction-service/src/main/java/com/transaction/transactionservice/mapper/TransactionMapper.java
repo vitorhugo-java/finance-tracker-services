@@ -1,10 +1,14 @@
 package com.transaction.transactionservice.mapper;
 
 import com.transaction.transactionservice.dto.request.CreateTransactionRequest;
+import com.transaction.transactionservice.dto.response.TransactionPageResponse;
 import com.transaction.transactionservice.dto.response.TransactionResponse;
 import com.transaction.transactionservice.entity.Transaction;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 @Mapper(
         componentModel = "spring"
@@ -39,4 +43,7 @@ public interface TransactionMapper {
             Transaction transaction
     );
 
+    TransactionPageResponse toPageResponse(
+            Page<Transaction> transaction
+    );
 }

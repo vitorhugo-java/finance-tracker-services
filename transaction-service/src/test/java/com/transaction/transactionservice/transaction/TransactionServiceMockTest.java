@@ -9,6 +9,7 @@ import com.transaction.transactionservice.event.TransactionEventPublisher;
 import com.transaction.transactionservice.mapper.TransactionMapper;
 import com.transaction.transactionservice.repository.TransactionRepository;
 import com.transaction.transactionservice.service.TransactionService;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,16 +23,17 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class RedisIdempotencyMockTest {
-    @Mock
-    private TransactionRepository repository;
+public class TransactionServiceMockTest {
     @InjectMocks
     private TransactionService transactionService;
+    @Mock
+    private TransactionRepository repository;
     @Mock
     private RedisTemplate<String, TransactionResponse> redisTemplate;
     @Mock
@@ -72,6 +74,26 @@ class RedisIdempotencyMockTest {
     }
 
     @Test
+    public void mustReturnNotNull_whenGetAllByUserId() {
+        when(redisTemplate.opsForValue().get(anyString())).thenReturn(null);
+
+        Transaction transactionMock = new Transaction();
+        transactionMock.setId(UUID.randomUUID());
+        transactionMock.setDescription(salaryMock);
+        transactionMock.setAmount(amountMock);
+        transactionMock.setCategory(categoryMock);
+        transactionMock.setType(TransactionType.INCOME);
+        transactionMock.setTransactionDate(nowMock);
+
+        when(mapper.toEntity(any(CreateTransactionRequest.class))).thenReturn(transactionMock);
+        when(repository.save(any(Transaction.class))).thenReturn(transactionMock);
+        when(mapper.toResponse(any(Transaction.class))).thenReturn(transactionResponseMock);
+
+        var result = transactionService.getAllByUserId(null);
+        assertThat(result).isNotNull();
+    }
+
+    @Test
     void mustReturnCachedResponse_whenKeyAlreadyExists() {
         when(redisTemplate.opsForValue().get("idempotency:transaction:key-123")).thenReturn(transactionResponseMock);
 
@@ -84,7 +106,7 @@ class RedisIdempotencyMockTest {
         ));
 
         // Assert that the result is the cached response
-        assertThat(result).isEqualTo(transactionResponseMock);
+        Assertions.assertThat(result).isEqualTo(transactionResponseMock);
         verify(repository, never()).save(any());
     }
 
@@ -113,7 +135,7 @@ class RedisIdempotencyMockTest {
         ));
 
         // Assert that the result is the expected response
-        assertThat(result).isEqualTo(transactionResponseMock);
+        Assertions.assertThat(result).isEqualTo(transactionResponseMock);
         verify(repository, times(1)).save(any(Transaction.class));
         verify(valueOperations, times(1)).set("idempotency:transaction:key-456", transactionResponseMock);
     }
