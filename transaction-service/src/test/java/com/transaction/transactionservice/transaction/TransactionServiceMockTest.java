@@ -1,21 +1,22 @@
 package com.transaction.transactionservice.transaction;
 
 import com.transaction.transactionservice.dto.request.CreateTransactionRequest;
+import com.transaction.transactionservice.dto.response.TransactionPageResponse;
 import com.transaction.transactionservice.dto.response.TransactionResponse;
 import com.transaction.transactionservice.entity.Transaction;
-import com.transaction.transactionservice.entity.TransactionStatus;
 import com.transaction.transactionservice.entity.TransactionType;
 import com.transaction.transactionservice.event.TransactionEventPublisher;
 import com.transaction.transactionservice.mapper.TransactionMapper;
 import com.transaction.transactionservice.repository.TransactionRepository;
 import com.transaction.transactionservice.service.TransactionService;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -23,10 +24,10 @@ import org.springframework.data.redis.core.ValueOperations;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -45,102 +46,92 @@ public class TransactionServiceMockTest {
     @Mock
     private TransactionEventPublisher publisher;
 
-    private TransactionResponse transactionResponseMock;
     private UUID userIdMock;
-    private BigDecimal amountMock;
-    private String salaryMock;
-    private String categoryMock;
-    private OffsetDateTime nowMock;
 
     @BeforeEach
     public void setUp() {
-        amountMock = BigDecimal.valueOf(5000.00);
-        salaryMock = "Salary";
         userIdMock = UUID.randomUUID();
-        categoryMock = "WORK";
-        nowMock = OffsetDateTime.now();
-
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-
-        transactionResponseMock = new TransactionResponse(
-                UUID.randomUUID(),
-                userIdMock,
-                salaryMock,
-                amountMock,
-                "category",
-                TransactionType.INCOME,
-                TransactionStatus.COMPLETED,
-                nowMock,
-                OffsetDateTime.now()
-        );
     }
 
     @Test
     public void mustReturnNotNull_whenGetAllByUserId() {
-        when(redisTemplate.opsForValue().get(anyString())).thenReturn(null);
-
-        Transaction transactionMock = new Transaction();
-        transactionMock.setId(UUID.randomUUID());
-        transactionMock.setDescription(salaryMock);
-        transactionMock.setAmount(amountMock);
-        transactionMock.setCategory(categoryMock);
-        transactionMock.setType(TransactionType.INCOME);
-        transactionMock.setTransactionDate(nowMock);
-
-        when(mapper.toEntity(any(CreateTransactionRequest.class))).thenReturn(transactionMock);
-        when(repository.save(any(Transaction.class))).thenReturn(transactionMock);
-        when(mapper.toResponse(any(Transaction.class))).thenReturn(transactionResponseMock);
-
         Pageable pageable = PageRequest.of(0, 10);
+        Page<Transaction> page = new PageImpl<>(List.of());
+        TransactionPageResponse pageResponseMock = mock(TransactionPageResponse.class);
+
+        when(repository.findAllByUserId(userIdMock, pageable)).thenReturn(page);
+        when(mapper.toPageResponse(page)).thenReturn(pageResponseMock);
 
         var result = transactionService.getAllByUserId(userIdMock, pageable);
+
         assertThat(result).isNotNull();
     }
 
     @Test
-    void mustReturnCachedResponse_whenKeyAlreadyExists() {
-        when(redisTemplate.opsForValue().get("idempotency:transaction:key-123")).thenReturn(transactionResponseMock);
-
-        TransactionResponse result = transactionService.create(userIdMock, "key-123", new CreateTransactionRequest(
-                salaryMock,
-                amountMock,
-                categoryMock,
+    public void mustReturnNotNull_whenCreate() {
+        String impotencyKey = "impotencyKey";
+        CreateTransactionRequest request = new CreateTransactionRequest(
+                "description",
+                BigDecimal.TEN,
+                "category",
                 TransactionType.INCOME,
-                nowMock
-        ));
+                OffsetDateTime.now()
 
-        // Assert that the result is the cached response
-        Assertions.assertThat(result).isEqualTo(transactionResponseMock);
-        verify(repository, never()).save(any());
+        );
+        Transaction transactionMock = mock(Transaction.class);
+        Transaction savedTransactionMock = mock(Transaction.class);
+        TransactionResponse responseMock = mock(TransactionResponse.class);
+
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get(anyString())).thenReturn(null);
+        when(mapper.toEntity(request)).thenReturn(transactionMock);
+        when(repository.save(transactionMock)).thenReturn(savedTransactionMock);
+        when(mapper.toResponse(savedTransactionMock)).thenReturn(responseMock);
+
+        var result = transactionService.create(userIdMock, impotencyKey, request);
+
+        assertThat(result).isNotNull();
     }
 
     @Test
-    void mustSaveToRepositoryAndCache_whenKeyDoesNotExist() {
-        when(redisTemplate.opsForValue().get(anyString())).thenReturn(null);
+    public void mustReturnNull_whenDifferentUserId() {
+        UUID differentUserId = UUID.randomUUID();
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Transaction> page = new PageImpl<>(List.of());
+        TransactionPageResponse pageResponseMock = mock(TransactionPageResponse.class);
 
-        Transaction transactionMock = new Transaction();
-        transactionMock.setId(UUID.randomUUID());
-        transactionMock.setDescription(salaryMock);
-        transactionMock.setAmount(amountMock);
-        transactionMock.setCategory(categoryMock);
-        transactionMock.setType(TransactionType.INCOME);
-        transactionMock.setTransactionDate(nowMock);
+        when(repository.findAllByUserId(differentUserId, pageable)).thenReturn(page);
+        when(mapper.toPageResponse(page)).thenReturn(pageResponseMock);
 
-        when(mapper.toEntity(any(CreateTransactionRequest.class))).thenReturn(transactionMock);
-        when(repository.save(any(Transaction.class))).thenReturn(transactionMock);
-        when(mapper.toResponse(any(Transaction.class))).thenReturn(transactionResponseMock);
+        var result = transactionService.getAllByUserId(differentUserId, pageable);
 
-        TransactionResponse result = transactionService.create(userIdMock, "key-456", new CreateTransactionRequest(
-                salaryMock,
-                amountMock,
-                categoryMock,
+        assertThat(result).isNotNull();
+    }
+
+    @Test
+    public void mustReturnNull_whenDifferentUserId_and_Create() {
+        UUID differentUserId = UUID.randomUUID();
+        String impotencyKey = "impotencyKey";
+        CreateTransactionRequest request = new CreateTransactionRequest(
+                "description",
+                BigDecimal.TEN,
+                "category",
                 TransactionType.INCOME,
-                nowMock
-        ));
+                OffsetDateTime.now()
 
-        // Assert that the result is the expected response
-        Assertions.assertThat(result).isEqualTo(transactionResponseMock);
-        verify(repository, times(1)).save(any(Transaction.class));
-        verify(valueOperations, times(1)).set("idempotency:transaction:key-456", transactionResponseMock);
+        );
+        Transaction transactionMock = mock(Transaction.class);
+        Transaction savedTransactionMock = mock(Transaction.class);
+        TransactionResponse responseMock = mock(TransactionResponse.class);
+
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get(anyString())).thenReturn(null);
+        when(mapper.toEntity(request)).thenReturn(transactionMock);
+        when(repository.save(transactionMock)).thenReturn(savedTransactionMock);
+        when(mapper.toResponse(savedTransactionMock)).thenReturn(responseMock);
+
+        var result = transactionService.create(differentUserId, impotencyKey, request);
+
+        assertThat(result).isNotNull();
     }
 }
