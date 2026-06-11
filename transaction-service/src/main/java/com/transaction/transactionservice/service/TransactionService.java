@@ -9,6 +9,7 @@ import com.transaction.transactionservice.mapper.TransactionMapper;
 import com.transaction.transactionservice.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +47,7 @@ public class TransactionService {
         return mapper.toResponse(saved);
     }
 
-    public TransactionPageResponse getAllByUserId(UUID userId) {
-        return null;
+    public TransactionPageResponse getAllByUserId(UUID userId, Pageable pageable) {
+        return mapper.toPageResponse(repository.findAllByUserId(userId, pageable));
     }
 }

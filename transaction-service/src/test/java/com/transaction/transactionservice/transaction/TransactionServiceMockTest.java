@@ -16,6 +16,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
@@ -89,7 +91,9 @@ public class TransactionServiceMockTest {
         when(repository.save(any(Transaction.class))).thenReturn(transactionMock);
         when(mapper.toResponse(any(Transaction.class))).thenReturn(transactionResponseMock);
 
-        var result = transactionService.getAllByUserId(null);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        var result = transactionService.getAllByUserId(userIdMock, pageable);
         assertThat(result).isNotNull();
     }
 
