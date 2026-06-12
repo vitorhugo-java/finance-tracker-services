@@ -64,6 +64,7 @@ subprojects {
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
         testImplementation 'org.springframework.boot:spring-boot-starter-amqp-test'
         testImplementation 'org.springframework.boot:spring-boot-starter-security-test'
+        testImplementation 'io.rest-assured:rest-assured:6.0.0'
 
         testRuntimeOnly 'com.h2database:h2'
     }
