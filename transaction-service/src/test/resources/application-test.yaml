@@ -6,3 +6,14 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost/fake-jwks
+
+application:
+  security:
+    keycloak:
+      realm: finance-tracker-realm
+      public-base-url: http://localhost:8180
