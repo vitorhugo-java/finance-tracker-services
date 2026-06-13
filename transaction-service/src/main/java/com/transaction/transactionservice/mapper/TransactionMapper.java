@@ -43,6 +43,8 @@ public interface TransactionMapper {
             Transaction transaction
     );
 
+    @Mapping(target = "pageNumber", source = "number")
+    @Mapping(target = "pageSize", source = "size")
     TransactionPageResponse toPageResponse(
             Page<Transaction> transaction
     );

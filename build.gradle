@@ -55,12 +55,13 @@ subprojects {
         runtimeOnly 'org.flywaydb:flyway-database-postgresql'
         runtimeOnly 'org.postgresql:postgresql'
         implementation 'org.mapstruct:mapstruct:1.6.3'
-        annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 
         implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2'
 
         compileOnly 'org.projectlombok:lombok'
         annotationProcessor 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+        annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 
         developmentOnly 'org.springframework.boot:spring-boot-devtools'
         implementation 'net.logstash.logback:logstash-logback-encoder:9.0'
