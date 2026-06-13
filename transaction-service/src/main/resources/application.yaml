@@ -46,6 +46,7 @@ spring:
       enabled: ${DOCKER_ENABLED:true}
 
 application:
+  gateway-url: ${GATEWAY_URL:http://localhost:8080}
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:4200,http://localhost:5173}
 
