@@ -9,6 +9,7 @@ import io.swagger.v3.oas.models.security.Scopes;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
+import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +27,21 @@ public class OpenApiConfiguration {
 
     @Value("${application.security.keycloak.realm}")
     private String keycloakRealm;
+
+    @Bean
+    OperationCustomizer pageableSortCustomizer() {
+        return (operation, handlerMethod) -> {
+            if (operation.getParameters() != null) {
+                operation.getParameters().stream()
+                        .filter(p -> "sort".equals(p.getName()))
+                        .forEach(p -> {
+                            p.setDescription("Sort by field and direction. Example: createdAt,desc");
+                            p.getSchema().setExample("createdAt,desc");
+                        });
+            }
+            return operation;
+        };
+    }
 
     @Bean
     OpenAPI transactionOpenApi() {
