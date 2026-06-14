@@ -1,5 +1,6 @@
 package com.transaction.transactionservice.dto.response;
 
+import com.transaction.transactionservice.entity.Transaction;
 import com.transaction.transactionservice.entity.TransactionStatus;
 import com.transaction.transactionservice.entity.TransactionType;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -67,7 +68,12 @@ public record TransactionResponse(
                 description = "Creation timestamp",
                 example = "2026-05-24T15:31:00Z"
         )
-        OffsetDateTime createdAt
+        OffsetDateTime createdAt,
 
+        @Schema(
+                description = "cached",
+                example = "true"
+        )
+        Boolean cached
 ) {
 }

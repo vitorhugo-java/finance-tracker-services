@@ -52,6 +52,9 @@ public class Transaction implements Serializable {
     @Column(nullable = false)
     private OffsetDateTime updatedAt;
 
+    @Transient
+    private boolean cached = false;
+
     @PrePersist
     void prePersist() {
         var now = OffsetDateTime.now();

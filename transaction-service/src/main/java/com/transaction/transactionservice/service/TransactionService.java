@@ -32,7 +32,9 @@ public class TransactionService {
         String redisKey = IDEMPOTENCY_PREFIX + impotencyKey;
         TransactionResponse cached = redisTemplate.opsForValue().get(redisKey);
         if (cached != null) {
-            return cached;
+            Transaction transaction = mapper.toEntity(cached);
+            transaction.setCached(true);
+            return mapper.toResponse(transaction);
         }
 
         Transaction transaction = mapper.toEntity(request);

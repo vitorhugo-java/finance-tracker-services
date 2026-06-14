@@ -35,9 +35,12 @@ public interface TransactionMapper {
             target = "updatedAt",
             ignore = true
     )
+
     Transaction toEntity(
             CreateTransactionRequest request
     );
+
+    Transaction toEntity(TransactionResponse response);
 
     TransactionResponse toResponse(
             Transaction transaction

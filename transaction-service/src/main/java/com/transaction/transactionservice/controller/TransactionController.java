@@ -32,7 +32,6 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a transaction", description = "Creates a financial transaction for the authenticated user")
     @ApiResponse(responseCode = "201", description = "Transaction created successfully")
     @ApiResponse(
@@ -45,7 +44,15 @@ public class TransactionController {
             description = "Resource not found",
             useReturnTypeSchema = true
     )
-    public TransactionResponse create(
+    @ApiResponse(
+            responseCode = "201",
+            description = "New transaction created"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Transaction already exists"
+    )
+    public ResponseEntity<TransactionResponse> create(
             @Parameter(description = "User id injected by gateway", hidden = true)
             @RequestHeader("X-User-Id")
             UUID userId,
@@ -58,8 +65,13 @@ public class TransactionController {
             @RequestBody
             CreateTransactionRequest request
     ) {
+        TransactionResponse response = transactionService.create(userId, idempotencyKey, request);
 
-        return transactionService.create(userId, idempotencyKey, request);
+        if (response != null && Boolean.TRUE.equals(response.cached())) {
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        }
     }
 
     @GetMapping
