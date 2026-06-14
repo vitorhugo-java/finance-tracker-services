@@ -1,6 +1,7 @@
 package com.transaction.transactionservice.controller;
 
-import com.transaction.transactionservice.dto.request.CreateTransactionRequest;
+import com.transaction.transactionservice.dto.internal.TransactionResult;
+import com.transaction.transactionservice.dto.request.TransactionRequest;
 import com.transaction.transactionservice.dto.response.TransactionPageResponse;
 import com.transaction.transactionservice.dto.response.TransactionResponse;
 import com.transaction.transactionservice.service.TransactionService;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
 
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Pageable;
@@ -58,19 +60,17 @@ public class TransactionController {
 
             @RequestHeader
             @Parameter(description = "Idempotency key for ensuring idempotent requests", example = "123e4567-e89b-12d3-a456-426614174000")
+            @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", message = "idempotencyKey must be a valid UUID")
             String idempotencyKey,
 
             @Valid
             @RequestBody
-            CreateTransactionRequest request
+            TransactionRequest request
     ) {
-        TransactionResponse response = transactionService.create(userId, idempotencyKey, request);
+        TransactionResult response = transactionService.create(userId, idempotencyKey, request);
 
-        if (response != null && Boolean.TRUE.equals(response.cached())) {
-            return ResponseEntity.ok(response);
-        } else {
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        }
+        if (response != null && response.cached()) return ResponseEntity.ok(response.transactionResponse());
+        else return ResponseEntity.status(HttpStatus.CREATED).body(response.transactionResponse());
     }
 
     @GetMapping

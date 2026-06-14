@@ -1,6 +1,6 @@
 package com.transaction.transactionservice.mapper;
 
-import com.transaction.transactionservice.dto.request.CreateTransactionRequest;
+import com.transaction.transactionservice.dto.request.TransactionRequest;
 import com.transaction.transactionservice.dto.response.TransactionPageResponse;
 import com.transaction.transactionservice.dto.response.TransactionResponse;
 import com.transaction.transactionservice.entity.Transaction;
@@ -35,7 +35,7 @@ public interface TransactionMapper {
     )
 
     Transaction toEntity(
-            CreateTransactionRequest request
+            TransactionRequest request
     );
 
     Transaction toEntity(TransactionResponse response);

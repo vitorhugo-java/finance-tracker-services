@@ -1,6 +1,7 @@
 package com.transaction.transactionservice.service;
 
-import com.transaction.transactionservice.dto.request.CreateTransactionRequest;
+import com.transaction.transactionservice.dto.internal.TransactionResult;
+import com.transaction.transactionservice.dto.request.TransactionRequest;
 import com.transaction.transactionservice.dto.response.TransactionPageResponse;
 import com.transaction.transactionservice.dto.response.TransactionResponse;
 import com.transaction.transactionservice.entity.Transaction;
@@ -27,13 +28,11 @@ public class TransactionService {
     private final TransactionEventPublisher publisher;
     private final RedisTemplate<String, TransactionResponse> redisTemplate;
 
-    public TransactionResponse create(UUID userId, String impotencyKey, CreateTransactionRequest request) {
+    public TransactionResult create(UUID userId, String impotencyKey, TransactionRequest request) {
         String redisKey = IDEMPOTENCY_PREFIX + impotencyKey;
         TransactionResponse cached = redisTemplate.opsForValue().get(redisKey);
         if (cached != null) {
-            Transaction transaction = mapper.toEntity(cached);
-            transaction.setCached(true);
-            return mapper.toResponse(transaction);
+            return new TransactionResult(cached, true);
         }
 
         Transaction transaction = mapper.toEntity(request);
@@ -45,7 +44,7 @@ public class TransactionService {
         TransactionResponse response = mapper.toResponse(saved);
         redisTemplate.opsForValue().set(redisKey, response);
 
-        return mapper.toResponse(saved);
+        return new TransactionResult(response, false);
     }
 
     public TransactionPageResponse getAllByUserId(UUID userId, Pageable pageable) {

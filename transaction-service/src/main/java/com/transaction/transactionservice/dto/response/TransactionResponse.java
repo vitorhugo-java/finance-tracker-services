@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
+// @With copy with
 @Schema(description = "Transaction response")
 public record TransactionResponse(
 
@@ -67,12 +68,6 @@ public record TransactionResponse(
                 description = "Creation timestamp",
                 example = "2026-05-24T15:31:00Z"
         )
-        OffsetDateTime createdAt,
-
-        @Schema(
-                description = "cached",
-                example = "true"
-        )
-        Boolean cached
+        OffsetDateTime createdAt
 ) {
 }

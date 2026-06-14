@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Schema(description = "Payload for transaction creation")
-public record CreateTransactionRequest(
+public record TransactionRequest(
 
         @Schema(
                 description = "Transaction description",

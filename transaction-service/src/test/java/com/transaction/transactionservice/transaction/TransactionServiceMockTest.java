@@ -1,6 +1,6 @@
 package com.transaction.transactionservice.transaction;
 
-import com.transaction.transactionservice.dto.request.CreateTransactionRequest;
+import com.transaction.transactionservice.dto.request.TransactionRequest;
 import com.transaction.transactionservice.dto.response.TransactionPageResponse;
 import com.transaction.transactionservice.dto.response.TransactionResponse;
 import com.transaction.transactionservice.entity.Transaction;
@@ -70,7 +70,7 @@ public class TransactionServiceMockTest {
     @Test
     public void mustReturnNotNull_whenCreate() {
         String impotencyKey = "impotencyKey";
-        CreateTransactionRequest request = new CreateTransactionRequest(
+        TransactionRequest request = new TransactionRequest(
                 "description",
                 BigDecimal.TEN,
                 "category",
@@ -112,7 +112,7 @@ public class TransactionServiceMockTest {
     public void mustReturnNull_whenDifferentUserId_and_Create() {
         UUID differentUserId = UUID.randomUUID();
         String impotencyKey = "impotencyKey";
-        CreateTransactionRequest request = new CreateTransactionRequest(
+        TransactionRequest request = new TransactionRequest(
                 "description",
                 BigDecimal.TEN,
                 "category",
