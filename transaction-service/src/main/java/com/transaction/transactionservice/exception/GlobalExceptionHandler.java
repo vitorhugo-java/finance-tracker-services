@@ -1,6 +1,7 @@
 package com.transaction.transactionservice.exception;
 
 import com.transaction.transactionservice.dto.response.ErrorResponse;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -88,6 +89,20 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.internalServerError().body(response);
+    }
+
+    @ExceptionHandler(InvalidDataAccessApiUsageException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidDataAccess(InvalidDataAccessApiUsageException ex) {
+
+        ErrorResponse response = new ErrorResponse(
+                OffsetDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Bad Request",
+                "Invalid query parameter: " + ex.getMostSpecificCause().getMessage(),
+                List.of()
+        );
+
+        return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(MissingRequestHeaderException.class)
