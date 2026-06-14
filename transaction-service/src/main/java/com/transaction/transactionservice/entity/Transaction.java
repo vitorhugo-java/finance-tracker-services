@@ -26,7 +26,7 @@ public class Transaction implements Serializable {
     @Column(nullable = false)
     private UUID userId;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String description;
 
     @Column(nullable = false, precision = 19, scale = 2)

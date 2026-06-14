@@ -30,7 +30,7 @@ public class OpenApiConfiguration {
 
     @Bean
     OperationCustomizer pageableSortCustomizer() {
-        return (operation, handlerMethod) -> {
+        return (operation, _) -> {
             if (operation.getParameters() != null) {
                 operation.getParameters().stream()
                         .filter(p -> "sort".equals(p.getName()))
