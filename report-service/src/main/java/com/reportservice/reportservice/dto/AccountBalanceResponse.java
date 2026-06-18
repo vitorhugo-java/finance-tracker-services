@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Schema(description = "Response payload for user report")
-public record ReportResponse(
+public record AccountBalanceResponse(
         @Schema(
                 description = "User ID",
                 example = "123e4567-e89b-12d3-a456-426614174000"
