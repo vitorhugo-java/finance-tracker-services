@@ -18,4 +18,6 @@ public interface AccountBalanceRepository extends JpaRepository<AccountBalance, 
             DO UPDATE SET balance = account_balance.balance + :delta, updated_at = now()
             """, nativeQuery = true)
     void applyDelta(@Param("userId") UUID userId, @Param("delta") BigDecimal delta);
+
+    void findAllByUserId(UUID userId);
 }
