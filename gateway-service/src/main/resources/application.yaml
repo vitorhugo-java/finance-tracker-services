@@ -72,6 +72,13 @@ spring:
               uri: ${REPORT_SERVICE_URI:http://localhost:8380}
               predicates:
                 - Path=/api/reports/**
+
+            - id: reports-docs-route
+              uri: ${TRANSACTION_SERVICE_URI:http://localhost:8280}
+              predicates:
+                - Path=/api/reports/v3/api-docs
+              filters:
+                - SetPath=/v3/api-docs
   docker:
     compose:
       profiles:
