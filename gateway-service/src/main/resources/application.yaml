@@ -79,6 +79,8 @@ spring:
               uri: ${REPORT_SERVICE_URI:http://localhost:8380}
               predicates:
                 - Path=/api/reports/**
+              filters:
+                - StripPrefix=2
   docker:
     compose:
       profiles:
