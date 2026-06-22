@@ -20,3 +20,18 @@ services:
 
   gateway-service:
     profiles: ["container"]
+
+  prometheus:
+    profiles: ["container"]
+
+  loki:
+    profiles: ["container"]
+
+  tempo:
+    profiles: ["container"]
+
+  promtail:
+    profiles: ["container"]
+
+  grafana:
+    profiles: ["container"]

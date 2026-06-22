@@ -131,4 +131,10 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info, metrics, env
+        include: health, info, metrics, env, prometheus
+  tracing:
+    sampling:
+      probability: 1.0
+  otlp:
+    tracing:
+      endpoint: http://${TEMPO_HOST:localhost}:4318/v1/traces

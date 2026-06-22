@@ -1,0 +1,25 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: transaction-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['transaction-service:8281']
+        labels:
+          service: transaction-service
+
+  - job_name: report-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['report-service:8381']
+        labels:
+          service: report-service
+
+  - job_name: gateway-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['gateway-service:8081']
+        labels:
+          service: gateway-service
