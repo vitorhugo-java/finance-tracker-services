@@ -1,7 +1,7 @@
 services:
   report-service:
     image: ghcr.io/vitorhugo-java/report-service:latest
-    ports: !reset [ ]
+    ports: !reset []
     deploy:
       resources:
         limits:
@@ -10,7 +10,7 @@ services:
 
   transaction-service:
     image: ghcr.io/vitorhugo-java/transaction-service:latest
-    ports: !reset [ ]
+    ports: !reset []
     deploy:
       resources:
         limits:
@@ -19,7 +19,6 @@ services:
 
   gateway-service:
     image: ghcr.io/vitorhugo-java/gateway-service:latest
-    ports: !reset [ ]
     deploy:
       resources:
         limits:
@@ -27,9 +26,21 @@ services:
           memory: 512M
 
   keycloak:
-    ports: !reset [ ]
+    ports: !reset []
     deploy:
       resources:
         limits:
           cpus: '0.5'
           memory: 512M
+
+  prometheus:
+    ports: !reset []
+
+  loki:
+    ports: !reset []
+
+  tempo:
+    ports: !reset []
+
+  grafana:
+    ports: !reset []

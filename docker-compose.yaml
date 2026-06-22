@@ -80,6 +80,9 @@ services:
       KEYCLOAK_PUBLIC_URL: http://keycloak:8080
       KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/finance-tracker-realm
       KEYCLOAK_SWAGGER_CLIENT_ID: gateway-swagger
+      KEYCLOAK_SERVICE_URI: http://keycloak:8080
+      TRANSACTION_SERVICE_URI: http://transaction-service:8280
+      REPORT_SERVICE_URI: http://report-service:8380
       TEMPO_HOST: tempo
     depends_on:
       keycloak:
