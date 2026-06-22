@@ -12,6 +12,7 @@ RUN chmod +x gradlew
 COPY build.gradle settings.gradle ./
 COPY report-service/build.gradle report-service/
 COPY transaction-service/build.gradle transaction-service/
+COPY gateway-service/build.gradle gateway-service/
 
 RUN ./gradlew dependencies --no-daemon || true
 

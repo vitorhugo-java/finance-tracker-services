@@ -64,7 +64,7 @@ services:
     networks:
       - finance_network
     healthcheck:
-      test: [ "CMD-SHELL","wget --spider -q http://localhost:9000/health/ready || exit 1" ]
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/localhost/9000; printf 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3; cat <&3 | grep -q '\"status\": \"UP\"'"]
       interval: 15s
       timeout: 5s
       retries: 15
@@ -119,10 +119,11 @@ services:
     networks:
       - finance_network
     healthcheck:
-      test: [ "CMD-SHELL","wget --spider -q http://localhost:8280/actuator/health || exit 1" ]
+      test: [ "CMD-SHELL","wget --spider -q http://localhost:8281/actuator/health || exit 1" ]
       interval: 15s
       timeout: 5s
       retries: 10
+      start_period: 120s
 
   report-service:
     build:
@@ -134,15 +135,27 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: report_service_db
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      KEYCLOAK_REALM: finance-tracker-realm
+      KEYCLOAK_PUBLIC_URL: http://keycloak:8080
+      KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/finance-tracker-realm
     ports:
       - "8380:8380"
     networks:
       - finance_network
     healthcheck:
-      test: [ "CMD","curl","-f","http://localhost:8380/actuator/health" ]
+      test: [ "CMD-SHELL","wget --spider -q http://localhost:8381/actuator/health || exit 1" ]
       interval: 15s
       timeout: 5s
       retries: 10
+      start_period: 120s
 
 volumes:
   postgres_data:

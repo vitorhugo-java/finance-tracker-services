@@ -40,7 +40,7 @@ public class OpenApiConfiguration {
     }
 
     @Bean
-    OpenAPI transactionOpenApi() {
+    OpenAPI reportOpenApi() {
         String authorizationUrl = keycloakBaseUrl + "/realms/" + keycloakRealm + "/protocol/openid-connect/auth";
         String tokenUrl = keycloakBaseUrl + "/realms/" + keycloakRealm + "/protocol/openid-connect/token";
 
@@ -58,11 +58,11 @@ public class OpenApiConfiguration {
                 .flows(new OAuthFlows().authorizationCode(authorizationCodeFlow));
 
         return new OpenAPI()
-                .addServersItem(new Server().url(gatewayUrl + "/api/transactions").description("Gateway"))
+                .addServersItem(new Server().url(gatewayUrl + "/api/reports").description("Gateway"))
                 .info(new Info()
-                        .title("Finance Tracker Transaction Service")
+                        .title("Finance Tracker Report Service")
                         .version("1.0.0")
-                        .description("Manages authenticated user financial transactions. User identity is supplied by the Gateway headers."))
+                        .description("Provides authenticated user financial reports and account balances. User identity is supplied by the Gateway headers."))
                 .components(new Components().addSecuritySchemes(SECURITY_SCHEME_NAME, securityScheme))
                 .addSecurityItem(new SecurityRequirement().addList(SECURITY_SCHEME_NAME));
     }
