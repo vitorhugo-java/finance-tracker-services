@@ -447,9 +447,10 @@ Key environment variables (defaults shown; set via compose or `.env`):
 
 | Variable | Used by | Default | Purpose |
 |----------|---------|---------|---------|
-| `KEYCLOAK_ISSUER_URI` | all services | `http://keycloak:8080/realms/finance-tracker-realm` | Expected JWT issuer + JWKS discovery |
+| `KEYCLOAK_ISSUER_URI` | all services | `http://localhost:8180/realms/finance-tracker-realm` | Expected JWT issuer (must equal the token's `iss` claim) |
+| `KEYCLOAK_JWK_SET_URI` | all services | `http://keycloak:8080/realms/finance-tracker-realm/protocol/openid-connect/certs` | Where services fetch signing keys (internal network) |
 | `KEYCLOAK_REALM` | all services | `finance-tracker-realm` | Realm name |
-| `KEYCLOAK_PUBLIC_URL` | all services | `http://keycloak:8080` | Keycloak base URL |
+| `KEYCLOAK_PUBLIC_URL` | all services | `http://localhost:8180` | Browser-facing Keycloak base URL (Swagger auth/token) |
 | `KEYCLOAK_SERVICE_URI` | gateway | `http://keycloak:8080` | Proxy target for `/auth/**` |
 | `TRANSACTION_SERVICE_URI` | gateway | `http://transaction-service:8280` | Routing target |
 | `REPORT_SERVICE_URI` | gateway | `http://report-service:8380` | Routing target |
@@ -459,10 +460,18 @@ Key environment variables (defaults shown; set via compose or `.env`):
 | `TEMPO_HOST` | all services | `tempo` | OTLP trace export target |
 | `CORS_ALLOWED_ORIGINS` | gateway | `localhost:3000,4200,5173` | Allowed browser origins |
 
-> **Important:** every service that validates JWTs must have a `KEYCLOAK_ISSUER_URI` that both
-> matches the token's `iss` claim *and* is network-reachable for JWKS discovery. Inside the Docker
-> network that means `http://keycloak:8080/...`, **not** `localhost:8180` (which only works from the
-> host). A mismatch here surfaces as blanket `401`s on authenticated endpoints.
+> **Important:** Keycloak stamps the token's `iss` claim with whatever hostname was used to
+> request the token. Because tokens are obtained from the host browser (`localhost:8180`) but the
+> backend services run inside Docker (`keycloak:8080`), the two names never match and you get
+> blanket `401`s (`The iss claim is not valid`).
+>
+> The fix (already wired up): Keycloak pins its public issuer with `KC_HOSTNAME=http://localhost:8180`
+> and `KC_HOSTNAME_BACKCHANNEL_DYNAMIC=true`, so **every** token carries `iss=http://localhost:8180/...`
+> regardless of access path. Each service then validates that fixed issuer (`KEYCLOAK_ISSUER_URI`)
+> while fetching signing keys over the internal network (`KEYCLOAK_JWK_SET_URI` →
+> `http://keycloak:8080/...`). Spring uses the explicit `jwk-set-uri` for the decoder and validates
+> the `iss` claim against `issuer-uri` without doing OIDC discovery, so the issuer string never needs
+> to be network-reachable from inside the containers.
 
 ---
 
