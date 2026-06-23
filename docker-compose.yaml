@@ -118,6 +118,9 @@ services:
       RABBITMQ_PORT: 5672
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      KEYCLOAK_REALM: finance-tracker-realm
+      KEYCLOAK_PUBLIC_URL: http://keycloak:8080
+      KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/finance-tracker-realm
       TEMPO_HOST: tempo
     ports:
       - "8280:8280"

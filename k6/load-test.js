@@ -17,7 +17,7 @@
  */
 
 import http from "k6/http";
-import { check, sleep } from "k6";
+import { check, sleep, fail } from "k6";
 import { Counter, Rate, Trend } from "k6/metrics";
 import { uuidv4 } from "https://jslib.k6.io/k6-utils/1.4.0/index.js";
 
@@ -45,6 +45,35 @@ const listDuration = new Trend("transaction_list_duration", true);
 const authDuration = new Trend("auth_token_duration", true);
 const transactionsCreated = new Counter("transactions_created_total");
 const transactionsListed = new Counter("transactions_listed_total");
+
+// ─── Readiness ───────────────────────────────────────────────────────────────
+
+// Keycloak's OIDC well-known endpoint — returns 200 once the realm is imported and ready.
+// Goes through the gateway (/auth/** → keycloak:8080) so no extra port needed.
+const KEYCLOAK_HEALTH_URL = `${BASE_URL}/auth/realms/${REALM}/.well-known/openid-configuration`;
+const READINESS_TIMEOUT_S = 120;
+const READINESS_POLL_S = 3;
+
+/**
+ * Blocks until Keycloak signals it is ready or times out.
+ * Runs once before any VU starts.
+ */
+export function setup() {
+  const deadline = Date.now() + READINESS_TIMEOUT_S * 1000;
+  console.log(`[setup] Waiting for Keycloak at ${KEYCLOAK_HEALTH_URL} …`);
+
+  while (Date.now() < deadline) {
+    const res = http.get(KEYCLOAK_HEALTH_URL, { timeout: "5s", tags: { name: "keycloak_health" } });
+    if (res.status === 200) {
+      console.log("[setup] Keycloak is ready.");
+      return;
+    }
+    console.warn(`[setup] Keycloak not ready yet (status=${res.status}), retrying in ${READINESS_POLL_S}s …`);
+    sleep(READINESS_POLL_S);
+  }
+
+  fail(`[setup] Keycloak did not become ready within ${READINESS_TIMEOUT_S}s`);
+}
 
 // ─── Scenarios ───────────────────────────────────────────────────────────────
 
