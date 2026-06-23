@@ -48,6 +48,21 @@
       "attributes": {
         "pkce.code.challenge.method": "S256"
       }
+    },
+    {
+      "clientId": "k6-test-client",
+      "name": "k6-test-client",
+      "description": "Confidential client for K6 load testing via Resource Owner Password Credentials grant.",
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "k6-test-secret",
+      "bearerOnly": false,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "enabled": true,
+      "webOrigins": ["*"]
     }
   ]
 }
