@@ -56,6 +56,11 @@ services:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin123
       KC_HEALTH_ENABLED: "true"
+      # Pin the public-facing issuer so every token carries iss=http://localhost:8180/...
+      # regardless of whether it was requested from the host browser or from inside the
+      # Docker network. Backchannel-dynamic lets services fetch JWKS at keycloak:8080.
+      KC_HOSTNAME: http://localhost:8180
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
     command: start-dev --import-realm
     ports:
       - "8180:8080"
@@ -77,8 +82,11 @@ services:
     container_name: gateway-service
     environment:
       KEYCLOAK_REALM: finance-tracker-realm
-      KEYCLOAK_PUBLIC_URL: http://keycloak:8080
-      KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/finance-tracker-realm
+      # Browser-facing endpoints (Swagger auth/token, issuer) must use localhost:8180.
+      KEYCLOAK_PUBLIC_URL: http://localhost:8180
+      KEYCLOAK_ISSUER_URI: http://localhost:8180/realms/finance-tracker-realm
+      # JWKS is fetched server-to-server, so it stays on the internal network.
+      KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/finance-tracker-realm/protocol/openid-connect/certs
       KEYCLOAK_SWAGGER_CLIENT_ID: gateway-swagger
       KEYCLOAK_SERVICE_URI: http://keycloak:8080
       TRANSACTION_SERVICE_URI: http://transaction-service:8280
@@ -119,8 +127,9 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       KEYCLOAK_REALM: finance-tracker-realm
-      KEYCLOAK_PUBLIC_URL: http://keycloak:8080
-      KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/finance-tracker-realm
+      KEYCLOAK_PUBLIC_URL: http://localhost:8180
+      KEYCLOAK_ISSUER_URI: http://localhost:8180/realms/finance-tracker-realm
+      KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/finance-tracker-realm/protocol/openid-connect/certs
       TEMPO_HOST: tempo
     ports:
       - "8280:8280"
@@ -152,8 +161,9 @@ services:
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_PORT: 5672
       KEYCLOAK_REALM: finance-tracker-realm
-      KEYCLOAK_PUBLIC_URL: http://keycloak:8080
-      KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/finance-tracker-realm
+      KEYCLOAK_PUBLIC_URL: http://localhost:8180
+      KEYCLOAK_ISSUER_URI: http://localhost:8180/realms/finance-tracker-realm
+      KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/finance-tracker-realm/protocol/openid-connect/certs
       TEMPO_HOST: tempo
     ports:
       - "8380:8380"
